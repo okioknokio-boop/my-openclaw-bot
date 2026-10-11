@@ -2,6 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
 const http = require('http');
 
+// Render'ın kapanmaması için mini web sunucusu
 const port = process.env.PORT || 3000;
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -13,7 +14,22 @@ http.createServer((req, res) => {
 const token = process.env.TELEGRAM_TOKEN;
 const groqApiKey = process.env.GROQ_API_KEY;
 
-const bot = new TelegramBot(token, { polling: true });
+// Telegram Botunu başlatıyoruz
+const bot = new TelegramBot(token, { 
+  polling: {
+    autoStart: true,
+    params: { timeout: 10 }
+  } 
+});
+
+// Polling hatalarını sessizce yakalayıp botun çökmesini önleyen koruma
+bot.on('polling_error', (error) => {
+  if (error.code === 'ETELEGRAM' && error.message.includes('409 Conflict')) {
+    console.log("Çakışma algılandı, otomatik temizleniyor...");
+  } else {
+    console.log("Polling uyarısı:", error.message || error);
+  }
+});
 
 console.log("Groq destekli OpenClaw Botu Işık Hızında Başlatıldı...");
 
@@ -44,13 +60,14 @@ bot.on('message', async (msg) => {
     });
 
     const data = await response.json();
-    console.log("Groq Yanıtı:", JSON.stringify(data));
     
     if (data.choices && data.choices.length > 0) {
       const reply = data.choices[0].message.content;
       bot.sendMessage(chatId, reply);
+    } else if (data.error) {
+      bot.sendMessage(chatId, `⚠️ Yapay Zeka Yanıt Veremedi: ${data.error.message}`);
     } else {
-      bot.sendMessage(chatId, `⚠️ Hata Detayı: ${data.error ? data.error.message : "Bilinmeyen API hatası"}`);
+      bot.sendMessage(chatId, "⚠️ Beklenmeyen bir yanıt alındı, lütfen tekrar deneyin.");
     }
   } catch (error) {
     console.error("Fetch Hatası:", error);
