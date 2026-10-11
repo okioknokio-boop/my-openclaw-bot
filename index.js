@@ -2,7 +2,6 @@ const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
 const http = require('http');
 
-// Render'ın kapanmaması ve port hatası vermemesi için mini web sunucusu
 const port = process.env.PORT || 3000;
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -45,15 +44,16 @@ bot.on('message', async (msg) => {
     });
 
     const data = await response.json();
+    console.log("Groq Yanıtı:", JSON.stringify(data)); // Hatayı loglarda görmek için
     
     if (data.choices && data.choices.length > 0) {
       const reply = data.choices[0].message.content;
       bot.sendMessage(chatId, reply);
     } else {
-      bot.sendMessage(chatId, "⚠️ Modelden yanıt alınamadı, lütfen tekrar dene.");
+      bot.sendMessage(chatId, `⚠️ Hata Detayı: ${data.error ? data.error.message : "Bilinmeyen API hatası"}`);
     }
   } catch (error) {
-    console.error("Hata:", error);
-    bot.sendMessage(chatId, "❌ Bir hata oluştu.");
+    console.error("Fetch Hatası:", error);
+    bot.sendMessage(chatId, "❌ Bağlantı hatası oluştu.");
   }
 });
