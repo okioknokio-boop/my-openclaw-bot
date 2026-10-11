@@ -1,5 +1,15 @@
 const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
+const http = require('http');
+
+// Render'ın kapanmaması ve port hatası vermemesi için mini web sunucusu
+const port = process.env.PORT || 3000;
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('OpenClaw Bot Aktif!\n');
+}).listen(port, () => {
+  console.log(`Port ${port} dinleniyor...`);
+});
 
 const token = process.env.TELEGRAM_TOKEN;
 const groqApiKey = process.env.GROQ_API_KEY;
