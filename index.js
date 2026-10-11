@@ -51,12 +51,12 @@ bot.on('message', async (msg) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "llama-3.3-70b-specdec",
-        "messages": [
-          { "role": "system", "content": "Sen OpenClaw altyapısıyla çalışan, çok akıllı, yardımsever ve Türkçe konuşan bir yapay zeka asistanısın." },
-          { "role": "user", "content": text }
-        ]
-      })
+      "model": "llama-3.1-8b-instant",
+      "messages": [
+        { "role": "system", "content": "Sen OpenClaw altyapısıyla çalışan, çok akıllı, yardımsever ve Türkçe konuşan bir yapay zeka asistanısın." },
+        { "role": "user", "content": text }
+      ]
+    })
     });
 
     const data = await response.json();
