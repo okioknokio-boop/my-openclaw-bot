@@ -44,7 +44,7 @@ bot.on('message', async (msg) => {
     });
 
     const data = await response.json();
-    console.log("Groq Yanıtı:", JSON.stringify(data)); // Hatayı loglarda görmek için
+    console.log("Groq Yanıtı:", JSON.stringify(data));
     
     if (data.choices && data.choices.length > 0) {
       const reply = data.choices[0].message.content;
