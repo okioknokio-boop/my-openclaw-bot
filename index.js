@@ -2,31 +2,31 @@ const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
 
 const token = process.env.TELEGRAM_TOKEN;
-const openrouterKey = process.env.OPENROUTER_KEY;
+const groqApiKey = process.env.GROQ_API_KEY;
 
 const bot = new TelegramBot(token, { polling: true });
 
-console.log("OpenClaw Telegram Botu Başlatıldı...");
+console.log("Groq destekli OpenClaw Botu Işık Hızında Başlatıldı...");
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
   if (!text || text.startsWith('/start')) {
-    return bot.sendMessage(chatId, "👋 Merhaba! Ben OpenClaw altyapılı ücretsiz yapay zeka botun. Sorunu sorabilirsin!");
+    return bot.sendMessage(chatId, "⚡ Merhaba! Ben Groq altyapısıyla ışık hızında çalışan yapay zeka botun. Sorunu sorabilirsin!");
   }
 
   bot.sendChatAction(chatId, 'typing');
 
   try {
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${openrouterKey}`,
+        "Authorization": `Bearer ${groqApiKey}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "meta-llama/llama-3.3-70b-instruct:free",
+        "model": "llama-3.3-70b-versatile",
         "messages": [
           { "role": "system", "content": "Sen OpenClaw altyapısıyla çalışan, çok akıllı, yardımsever ve Türkçe konuşan bir yapay zeka asistanısın." },
           { "role": "user", "content": text }
