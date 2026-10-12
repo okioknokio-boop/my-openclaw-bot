@@ -2,7 +2,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const fetch = require('node-fetch');
 const http = require('http');
 
-// Render'ın kapanmaması için mini web sunucusu
+// Render mecburi HTTP sunucusu
 const port = process.env.PORT || 3000;
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
@@ -14,7 +14,6 @@ http.createServer((req, res) => {
 const token = process.env.TELEGRAM_TOKEN;
 const groqApiKey = process.env.GROQ_API_KEY;
 
-// Telegram Botunu başlatıyoruz
 const bot = new TelegramBot(token, { 
   polling: {
     autoStart: true,
@@ -22,16 +21,13 @@ const bot = new TelegramBot(token, {
   } 
 });
 
-// Polling hatalarını sessizce yakalayıp botun çökmesini önleyen koruma
+// Hatayı sessizce yutup botun sürekli açık kalmasını sağlayan zırh
 bot.on('polling_error', (error) => {
-  if (error.code === 'ETELEGRAM' && error.message.includes('409 Conflict')) {
-    console.log("Çakışma algılandı, otomatik temizleniyor...");
-  } else {
-    console.log("Polling uyarısı:", error.message || error);
-  }
+  // Polling hatalarını konsola yazıp geçiyoruz, bot kapanmayacak
+  console.log("Bağlantı durumu:", error.message || error);
 });
 
-console.log("Groq destekli OpenClaw Botu Işık Hızında Başlatıldı...");
+console.log("OpenClaw Bot Işık Hızında Başlatıldı...");
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
@@ -51,12 +47,12 @@ bot.on('message', async (msg) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-      "model": "llama-3.1-8b-instant",
-      "messages": [
-        { "role": "system", "content": "Sen OpenClaw altyapısıyla çalışan, çok akıllı, yardımsever ve Türkçe konuşan bir yapay zeka asistanısın." },
-        { "role": "user", "content": text }
-      ]
-    })
+        "model": "openai/gpt-oss-20b",
+        "messages": [
+          { "role": "system", "content": "Sen OpenClaw altyapısıyla çalışan, çok akıllı, son derece hızlı ve Türkçe konuşan bir yapay zeka asistanısın." },
+          { "role": "user", "content": text }
+        ]
+      })
     });
 
     const data = await response.json();
@@ -65,9 +61,9 @@ bot.on('message', async (msg) => {
       const reply = data.choices[0].message.content;
       bot.sendMessage(chatId, reply);
     } else if (data.error) {
-      bot.sendMessage(chatId, `⚠️ Yapay Zeka Yanıt Veremedi: ${data.error.message}`);
+      bot.sendMessage(chatId, `⚠️ Yapay Zeka Hatası: ${data.error.message}`);
     } else {
-      bot.sendMessage(chatId, "⚠️ Beklenmeyen bir yanıt alındı, lütfen tekrar deneyin.");
+      bot.sendMessage(chatId, "⚠️ Beklenmeyen bir yanıt alındı.");
     }
   } catch (error) {
     console.error("Fetch Hatası:", error);
