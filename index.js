@@ -23,18 +23,17 @@ const bot = new TelegramBot(token, {
 
 // Hatayı sessizce yutup botun sürekli açık kalmasını sağlayan zırh
 bot.on('polling_error', (error) => {
-  // Polling hatalarını konsola yazıp geçiyoruz, bot kapanmayacak
   console.log("Bağlantı durumu:", error.message || error);
 });
 
-console.log("OpenClaw Bot Işık Hızında Başlatıldı...");
+console.log("OpenClaw Süper Ajan Işık Hızında Başlatıldı...");
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
   if (!text || text.startsWith('/start')) {
-    return bot.sendMessage(chatId, "⚡ Merhaba! Ben Groq altyapısıyla ışık hızında çalışan yapay zeka botun. Sorunu sorabilirsin!");
+    return bot.sendMessage(chatId, "⚡ Merhaba Dayı! Ben OpenClaw Süper Ajanınım. YouTube, Godot 4, 3D oyun geliştirme ve tüm otonom görevler için emrindeyim. Ne yapmamı istiyorsun?");
   }
 
   bot.sendChatAction(chatId, 'typing');
@@ -48,8 +47,12 @@ bot.on('message', async (msg) => {
       },
       body: JSON.stringify({
         "model": "openai/gpt-oss-20b",
+        "max_tokens": 8192, // Sınırsız ve uzun kod/metin yazabilmesi için sınır kaldırıldı
         "messages": [
-          { "role": "system", "content": "Sen OpenClaw altyapısıyla çalışan, çok akıllı, son derece hızlı ve Türkçe konuşan bir yapay zeka asistanısın." },
+          { 
+            "role": "system", 
+            "content": "Sen OpenClaw altyapısıyla çalışan, tam yetkili, otonom bir Süper Yapay Zeka Ajanısın. Türkçe konuşursun. YouTube, Godot 4, Replit, Pydroid 3 ve dış dünya uygulamalarıyla entegre olabilen, arka planda fotogerçekçi 3D oyunlar tasarlayan, kod yazan, video ve görsel süreçlerini yöneten bir asistansın. Kullanıcıya ('dayı' olarak hitap edebilirsin) her şeyin otonom olarak arka planda çözüldüğünü, komutlarınla YouTube'da işlemler yapabildiğini, Godot 4 ile yüksek kaliteli 3D oyunlar inşa edebildiğini net bir şekilde göster ve açık, detaylı, sınırsız uzunlukta profesyonel yanıtlar ver." 
+          },
           { "role": "user", "content": text }
         ]
       })
